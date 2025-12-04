@@ -32,6 +32,299 @@
     </ul>
 
     <h3>Online Application Form</h3>
+    <!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sadhana Degree College — Admissions</title>
+  <style>
+    body{font-family:Arial, Helvetica, sans-serif;background:#f6f6f6;color:#222}
+    .container{max-width:900px;margin:30px auto;background:white;padding:28px;border:1px solid #e0e0e0}
+    h1{color:#1d4e73;text-align:center}
+    label{display:block;margin:14px 0 6px;font-weight:600}
+    .form-row{margin-bottom:14px}
+    input[type="text"], input[type="email"], input[type="tel"], select{width:320px;padding:6px;border:1px solid #ccc;border-radius:3px}
+    input[type="file"]{display:block}
+    .uploads{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+    .preview{width:110px;height:80px;border:1px dashed #bbb;padding:6px;display:flex;align-items:center;justify-content:center;font-size:12px;background:#fff}
+    .preview img{max-width:100%;max-height:100%}
+    .error{color:#c00;margin-top:6px}
+    .note{font-size:13px;color:#555;margin-top:6px}
+    button{background:#1d4e73;color:#fff;border:0;padding:10px 16px;border-radius:4px;cursor:pointer}
+
+    /* OTP modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:40}
+    .modal{background:#fff;padding:18px;border-radius:8px;max-width:420px;width:92%;box-shadow:0 6px 24px rgba(0,0,0,0.2)}
+    .modal h4{margin-top:0}
+    .small{font-size:13px;color:#666}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Admissions — Online Application</h1>
+    <form id="admissionForm" action="/submit-admission" method="post" enctype="multipart/form-data">
+      <div class="form-row">
+        <label for="name">Your Name</label>
+        <input id="name" name="name" type="text" required />
+      </div>
+
+      <div class="form-row">
+        <label for="mobile">Mobile Number</label>
+        <input id="mobile" name="mobile" type="tel" required placeholder="e.g. +919xxxxxxxxx" />
+      </div>
+
+      <div class="form-row">
+        <label for="email">Your Email</label>
+        <input id="email" name="email" type="email" required />
+      </div>
+
+      <hr />
+      <h3>Upload Documents</h3>
+      <p class="note">Allowed file types: JPG, JPEG, PNG, PDF. You may upload multiple files where needed. (No client-side size limit enforced — server may still impose limits.)</p>
+
+      <!-- 10th marksheet -->
+      <div class="form-row">
+        <label for="marks10">10th Marksheets (10th_memo)</label>
+        <input id="marks10" name="marks10" type="file" accept=".jpg,.jpeg,.png,.pdf,image/*" required data-field="10th Marksheets" />
+        <div class="uploads" id="preview-marks10"></div>
+        <div class="error" id="err-marks10"></div>
+      </div>
+
+      <!-- 12th marksheet -->
+      <div class="form-row">
+        <label for="marks12">12th / Inter Marksheets (12th_memo)</label>
+        <input id="marks12" name="marks12" type="file" accept=".jpg,.jpeg,.png,.pdf,image/*" required data-field="12th Marksheets" />
+        <div class="uploads" id="preview-marks12"></div>
+        <div class="error" id="err-marks12"></div>
+      </div>
+
+      <!-- Study certificates (allow multiple) -->
+      <div class="form-row">
+        <label for="studyCert">Study Certificates (study_certificate)</label>
+        <input id="studyCert" name="studyCert" type="file" accept=".jpg,.jpeg,.png,.pdf,image/*" multiple data-field="Study Certificates" />
+        <div class="uploads" id="preview-studyCert"></div>
+        <div class="error" id="err-studyCert"></div>
+      </div>
+
+      <!-- Aadhaar Card -->
+      <div class="form-row">
+        <label for="aadhar">Aadhar Card (aadhar_card)</label>
+        <input id="aadhar" name="aadhar" type="file" accept=".jpg,.jpeg,.png,.pdf,image/*" required data-field="Aadhar Card" />
+        <div class="uploads" id="preview-aadhar"></div>
+        <div class="error" id="err-aadhar"></div>
+      </div>
+
+      <!-- Caste certificate -->
+      <div class="form-row">
+        <label for="caste">Caste Certificate (caste_certificate)</label>
+        <input id="caste" name="caste" type="file" accept=".jpg,.jpeg,.png,.pdf,image/*" multiple data-field="Caste Certificate" />
+        <div class="uploads" id="preview-caste"></div>
+        <div class="error" id="err-caste"></div>
+      </div>
+
+      <!-- Income certificate -->
+      <div class="form-row">
+        <label for="income">Income Certificate (income_certificate)</label>
+        <input id="income" name="income" type="file" accept=".jpg,.jpeg,.png,.pdf,image/*" multiple data-field="Income Certificate" />
+        <div class="uploads" id="preview-income"></div>
+        <div class="error" id="err-income"></div>
+      </div>
+
+      <input type="hidden" name="otp_verified" id="otp_verified" value="0" />
+
+      <div style="margin-top:18px">
+        <button id="submitBtn" type="submit">Submit Application</button>
+      </div>
+
+      <div class="note" style="margin-top:12px">Note: replace the form <code>action</code> with your server endpoint. Client-side checks help but you must validate and securely store files on the server. For real OTP delivery, implement an SMS gateway on the server and call it from the browser.</div>
+    </form>
+  </div>
+
+  <!-- OTP Modal -->
+  <div id="otpBackdrop" class="modal-backdrop">
+    <div class="modal" role="dialog" aria-modal="true">
+      <h4>Enter OTP</h4>
+      <p class="small" id="otpSentInfo">We will send a 6-digit OTP to your mobile.</p>
+      <div style="margin-top:10px">
+        <label for="otpInput">OTP</label>
+        <input id="otpInput" type="text" inputmode="numeric" maxlength="6" style="padding:6px;width:140px;border:1px solid #ccc;border-radius:3px" />
+        <div class="error" id="err-otp" style="margin-top:8px"></div>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+        <button id="verifyOtpBtn">Verify OTP</button>
+        <button id="resendOtpBtn" type="button" style="background:#666;color:#fff;padding:8px 12px;border-radius:4px">Resend</button>
+        <div style="margin-left:auto;font-size:13px;color:#666" id="otpTimer"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // config
+    // No client-side size limit enforced by request (server may still enforce limits).
+    const allowedExtensions = ['.pdf','.jpg','.jpeg','.png'];
+
+    function fileIsAllowed(file){
+      const name = (file.name || '').toLowerCase();
+      return allowedExtensions.some(ext => name.endsWith(ext)) || file.type.startsWith('image/');
+    }
+
+    function handleFiles(inputEl, previewContainer, errorEl){
+      previewContainer.innerHTML = '';
+      errorEl.textContent = '';
+      const files = Array.from(inputEl.files || []);
+      if(files.length === 0) return;
+
+      files.forEach(file => {
+        if(!fileIsAllowed(file)){
+          errorEl.textContent = 'Invalid file type: ' + file.name;
+          return;
+        }
+
+        const previewBox = document.createElement('div');
+        previewBox.className = 'preview';
+
+        if(file.type.startsWith('image/') || /(\.jpg|\.jpeg|\.png)$/i.test(file.name)){
+          const img = document.createElement('img');
+          const reader = new FileReader();
+          reader.onload = e => img.src = e.target.result;
+          reader.readAsDataURL(file);
+          previewBox.appendChild(img);
+        } else {
+          // PDF or other: show icon + name
+          const span = document.createElement('div');
+          span.style.textAlign = 'center';
+          span.innerHTML = '<strong>PDF</strong><div style="font-size:11px;margin-top:6px;">' + file.name + '</div>';
+          previewBox.appendChild(span);
+        }
+
+        previewContainer.appendChild(previewBox);
+      });
+    }
+
+    // wire up inputs
+    document.querySelectorAll('input[type=file]').forEach(input => {
+      const id = input.id;
+      const preview = document.getElementById('preview-' + id);
+      const err = document.getElementById('err-' + id);
+      input.addEventListener('change', () => handleFiles(input, preview, err));
+    });
+
+    // OTP flow (client-side demo)
+    let currentOtp = null;
+    let otpExpiresAt = 0;
+    let resendCooldown = 30; // seconds
+    let resendTimer = null;
+
+    const otpBackdrop = document.getElementById('otpBackdrop');
+    const otpInput = document.getElementById('otpInput');
+    const errOtp = document.getElementById('err-otp');
+    const otpTimer = document.getElementById('otpTimer');
+    const otpSentInfo = document.getElementById('otpSentInfo');
+
+    function showOtpModal(mobile){
+      otpBackdrop.style.display = 'flex';
+      otpInput.value = '';
+      errOtp.textContent = '';
+      otpSentInfo.textContent = 'Sending OTP to ' + mobile + '
+(For demo the OTP is logged to the browser console)';
+      startResendCooldown(resendCooldown);
+    }
+
+    function hideOtpModal(){
+      otpBackdrop.style.display = 'none';
+      stopResendCooldown();
+    }
+
+    function generateOtp(){
+      const code = Math.floor(100000 + Math.random()*900000).toString();
+      currentOtp = code;
+      otpExpiresAt = Date.now() + (5*60*1000); // 5 minutes
+      console.log('DEBUG OTP (send this via SMS on server):', code);
+      return code;
+    }
+
+    function startResendCooldown(seconds){
+      let remaining = seconds;
+      otpTimer.textContent = 'Resend in ' + remaining + 's';
+      resendTimer = setInterval(()=>{
+        remaining -=1;
+        if(remaining<=0){ otpTimer.textContent = ''; clearInterval(resendTimer); resendTimer = null; }
+        else otpTimer.textContent = 'Resend in ' + remaining + 's';
+      },1000);
+    }
+    function stopResendCooldown(){ if(resendTimer){ clearInterval(resendTimer); resendTimer = null; otpTimer.textContent = ''; } }
+
+    document.getElementById('resendOtpBtn').addEventListener('click', ()=>{
+      if(resendTimer){ errOtp.textContent = 'Please wait before resending.'; return; }
+      // regenerate OTP and (in production) request server to send SMS
+      generateOtp();
+      startResendCooldown(resendCooldown);
+      errOtp.textContent = 'OTP resent (demo).';
+    });
+
+    document.getElementById('verifyOtpBtn').addEventListener('click', ()=>{
+      errOtp.textContent = '';
+      const entered = (otpInput.value || '').trim();
+      if(!/^[0-9]{6}$/.test(entered)){ errOtp.textContent = 'Enter the 6-digit OTP.'; return; }
+      if(!currentOtp || Date.now() > otpExpiresAt){ errOtp.textContent = 'OTP expired. Resend and try again.'; return; }
+      if(entered !== currentOtp){ errOtp.textContent = 'Incorrect OTP.'; return; }
+      // verified
+      document.getElementById('otp_verified').value = '1';
+      hideOtpModal();
+      // now submit the form for real
+      document.getElementById('admissionForm').submit();
+    });
+
+    // final client-side validation before submit -> starts OTP flow
+    document.getElementById('admissionForm').addEventListener('submit', function(ev){
+      // if already OTP verified, allow normal submit
+      if(document.getElementById('otp_verified').value === '1') return true;
+
+      ev.preventDefault(); // intercept to run file checks and OTP
+
+      const requiredFiles = ['marks10','marks12','aadhar'];
+      let ok = true;
+      requiredFiles.forEach(id => {
+        const el = document.getElementById(id);
+        if(!el || !el.files || el.files.length === 0){
+          document.getElementById('err-' + id).textContent = 'This document is required';
+          ok = false;
+        }
+      });
+
+      // basic file type check for all inputs
+      document.querySelectorAll('input[type=file]').forEach(inp=>{
+        const errEl = document.getElementById('err-' + inp.id);
+        errEl.textContent = '';
+        Array.from(inp.files || []).forEach(f=>{
+          if(!fileIsAllowed(f)){
+            errEl.textContent = 'Invalid file type: ' + f.name; ok=false;
+          }
+        });
+      });
+
+      if(!ok){ window.scrollTo({top:0,behavior:'smooth'}); return; }
+
+      // START OTP FLOW
+      const mobile = document.getElementById('mobile').value.trim();
+      if(!mobile){ alert('Enter mobile number to receive OTP'); return; }
+
+      // In production: POST to your server to send the OTP SMS to the mobile number, then show modal.
+      // Example (uncomment when you have a server endpoint):
+      // fetch('/send-otp', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mobile})})
+      //  .then(r=>r.json()).then(res=>{ if(res.success) showOtpModal(mobile); else alert('Failed to send OTP'); })
+      
+      // For demo-only: generate OTP on the client and show modal (INSECURE — replace with server SMS)
+      generateOtp();
+      showOtpModal(mobile);
+
+    });
+
+  </script>
+</body>
+</html>
+
     <form action="https://formspree.io/f/mdkpnpjg" method="POST">
   <label>Your Name:</label><br>
   <input type="text" name="name" required><br><br>
@@ -54,3 +347,4 @@
   </footer>
 </body>
 </html>
+
