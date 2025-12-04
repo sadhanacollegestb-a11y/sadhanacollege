@@ -32,53 +32,6 @@
     </ul>
 
     <h3>Online Application Form</h3>
-    <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Sadhana Degree College — Admissions</title>
-  <style>
-    body{font-family:Arial, Helvetica, sans-serif;background:#f6f6f6;color:#222}
-    .container{max-width:900px;margin:30px auto;background:white;padding:28px;border:1px solid #e0e0e0}
-    h1{color:#1d4e73;text-align:center}
-    label{display:block;margin:14px 0 6px;font-weight:600}
-    .form-row{margin-bottom:14px}
-    input[type="text"], input[type="email"], input[type="tel"], select{width:320px;padding:6px;border:1px solid #ccc;border-radius:3px}
-    input[type="file"]{display:block}
-    .uploads{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
-    .preview{width:110px;height:80px;border:1px dashed #bbb;padding:6px;display:flex;align-items:center;justify-content:center;font-size:12px;background:#fff}
-    .preview img{max-width:100%;max-height:100%}
-    .error{color:#c00;margin-top:6px}
-    .note{font-size:13px;color:#555;margin-top:6px}
-    button{background:#1d4e73;color:#fff;border:0;padding:10px 16px;border-radius:4px;cursor:pointer}
-
-    /* OTP modal */
-    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:40}
-    .modal{background:#fff;padding:18px;border-radius:8px;max-width:420px;width:92%;box-shadow:0 6px 24px rgba(0,0,0,0.2)}
-    .modal h4{margin-top:0}
-    .small{font-size:13px;color:#666}
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>Admissions — Online Application</h1>
-    <form id="admissionForm" action="/submit-admission" method="post" enctype="multipart/form-data">
-      <div class="form-row">
-        <label for="name">Your Name</label>
-        <input id="name" name="name" type="text" required />
-      </div>
-
-      <div class="form-row">
-        <label for="mobile">Mobile Number</label>
-        <input id="mobile" name="mobile" type="tel" required placeholder="e.g. +919xxxxxxxxx" />
-      </div>
-
-      <div class="form-row">
-        <label for="email">Your Email</label>
-        <input id="email" name="email" type="email" required />
-      </div>
-
       <hr />
       <h3>Upload Documents</h3>
       <p class="note">Allowed file types: JPG, JPEG, PNG, PDF. You may upload multiple files where needed. (No client-side size limit enforced — server may still impose limits.)</p>
@@ -322,9 +275,6 @@
     });
 
   </script>
-</body>
-</html>
-
     <form action="https://formspree.io/f/mdkpnpjg" method="POST">
   <label>Your Name:</label><br>
   <input type="text" name="name" required><br><br>
@@ -347,4 +297,5 @@
   </footer>
 </body>
 </html>
+
 
